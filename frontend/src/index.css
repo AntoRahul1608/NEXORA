@@ -99,7 +99,25 @@ body {
 .glow-secondary {
   box-shadow: 0 0 20px rgba(24, 214, 176, 0.15), 0 0 60px rgba(24, 214, 176, 0.05);
 }
+/* Ambient blurred glow blobs used behind the chat panel */
+.glow-blur-primary,
+.glow-blur-secondary {
+  position: absolute;
+  width: 420px;
+  height: 420px;
+  border-radius: 9999px;
+  filter: blur(120px);
+  pointer-events: none;
+  z-index: 0;
+}
 
+.glow-blur-primary {
+  background: rgba(255, 150, 64, 0.12);
+}
+
+.glow-blur-secondary {
+  background: rgba(24, 214, 176, 0.1);
+}
 /* Background grid pattern */
 .bg-grid {
   background-image: radial-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 0);
