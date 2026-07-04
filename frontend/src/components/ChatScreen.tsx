@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { sendMessage } from '../api/api';
 import { useNexoraStore } from '../store/store';
 import { MessageBubble } from './MessageBubble';
-import { SendHorizontal, Loader2, Sparkles } from 'lucide-react';
+import { SendHorizontal, Loader2, Sparkles, Paperclip } from 'lucide-react';
 
 export const ChatScreen: React.FC = () => {
   const sessionId = useNexoraStore((state) => state.sessionId);
