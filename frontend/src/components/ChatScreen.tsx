@@ -17,21 +17,32 @@ export const ChatScreen: React.FC = () => {
   const isLoading = useNexoraStore((state) => state.isLoading);
   const setLoading = useNexoraStore((state) => state.setLoading);
 
-  const [input, setInput] = useState('');
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  // After
+const [input, setInput] = useState('');
+const messagesEndRef = useRef<HTMLDivElement>(null);
+const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Auto-scroll to bottom of messages
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, currentUI, isLoading]);
+// Auto-scroll to bottom of messages
+useEffect(() => {
+  messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+}, [messages, currentUI, isLoading]);
 
-  const handleSend = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim() || !sessionId || isLoading) return;
+// Auto-resize the textarea as the user types, capped at ~7 lines
+useEffect(() => {
+  const el = textareaRef.current;
+  if (!el) return;
+  el.style.height = 'auto';
+  el.style.height = `${Math.min(el.scrollHeight, 200)}px`;
+}, [input]);
 
-    const userMessage = input.trim();
-    setInput('');
-    setLoading(true);
+const handleSend = async (e: React.FormEvent) => {
+  e.preventDefault();
+  if (!input.trim() || !sessionId || isLoading) return;
+
+  const userMessage = input.trim();
+  setInput('');
+  if (textareaRef.current) textareaRef.current.style.height = 'auto';
+  setLoading(true);
 
     // Save user message immediately in store
     const now = new Date().toISOString();
@@ -204,33 +215,61 @@ export const ChatScreen: React.FC = () => {
       </div>
 
       {/* Message input bar */}
-      <footer className="p-6 border-t border-dark-400 bg-dark-900/60 glass relative z-1">
-        <form onSubmit={handleSend} className="max-w-4xl mx-auto flex gap-4">
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder={
-              sessionId
-                ? 'Ask NEXORA anything about your data...'
-                : 'Select a conversation in the sidebar or create a new one to begin'
-            }
-            disabled={!sessionId || isLoading}
-            className="flex-1 px-4 py-3.5 rounded-xl bg-dark-800 border border-dark-600 focus:border-accent-primary/60 text-white placeholder-dark-300 focus:outline-none focus:ring-2 focus:ring-accent-primary/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm"
-          />
-          <button
-            type="submit"
-            disabled={!sessionId || !input.trim() || isLoading}
-            className="px-5 py-3.5 rounded-xl bg-gradient-to-r from-accent-primary to-orange-500 text-dark-900 font-bold hover:brightness-105 hover:shadow-lg active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-          >
-            {isLoading ? (
-              <Loader2 className="h-5 w-5 animate-spin" />
-            ) : (
-              <SendHorizontal size={18} />
-            )}
-          </button>
-        </form>
-      </footer>
+      // After
+<footer className="px-6 pb-8 pt-2 bg-dark-900/60 relative z-1">
+  <form
+    onSubmit={handleSend}
+    className={`max-w-3xl mx-auto flex items-end gap-2 p-3 rounded-[28px] bg-dark-800 border transition-all shadow-2xl shadow-black/30 ${
+      sessionId
+        ? 'border-dark-600 focus-within:border-accent-primary/60 focus-within:ring-2 focus-within:ring-accent-primary/20'
+        : 'border-dark-700 opacity-60'
+    }`}
+  >
+    <button
+      type="button"
+      disabled={!sessionId || isLoading}
+      title="Attach a file"
+      className="shrink-0 h-11 w-11 flex items-center justify-center rounded-full text-dark-300 hover:text-white hover:bg-dark-700 transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+    >
+      <Paperclip size={19} />
+    </button>
+
+    <textarea
+      ref={textareaRef}
+      rows={1}
+      value={input}
+      onChange={(e) => setInput(e.target.value)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          handleSend(e);
+        }
+      }}
+      placeholder={
+        sessionId
+          ? 'Ask NEXORA anything about your data...'
+          : 'Select a conversation in the sidebar or create a new one to begin'
+      }
+      disabled={!sessionId || isLoading}
+      className="flex-1 resize-none max-h-[200px] bg-transparent text-white placeholder-dark-300 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed text-base leading-relaxed py-3 px-1"
+    />
+
+    <button
+      type="submit"
+      disabled={!sessionId || !input.trim() || isLoading}
+      className="shrink-0 h-11 w-11 flex items-center justify-center rounded-full bg-gradient-to-r from-accent-primary to-orange-500 text-dark-900 font-bold hover:brightness-105 hover:shadow-lg hover:shadow-accent-primary/20 active:scale-[0.96] transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:shadow-none cursor-pointer"
+    >
+      {isLoading ? (
+        <Loader2 className="h-5 w-5 animate-spin" />
+      ) : (
+        <SendHorizontal size={19} />
+      )}
+    </button>
+  </form>
+  <p className="text-center text-[11px] text-dark-300 mt-2.5 tracking-wide">
+    NEXORA can make mistakes. Verify important information before acting on it.
+  </p>
+</footer>
     </div>
   );
 };
