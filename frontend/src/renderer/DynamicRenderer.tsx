@@ -79,7 +79,7 @@ export const DynamicUI: React.FC<{ schema: UIComponent | null }> = ({ schema }) 
   if (!schema) return null;
   return (
     <AnimatePresence mode="wait">
-      <div className="w-full p-4 rounded-2xl border border-dark-600 bg-dark-800/30 glass glow-primary space-y-4">
+      <div className="w-full space-y-3">
         <ErrorBoundary>
           <DynamicRenderer key={schema.id} node={schema} />
         </ErrorBoundary>

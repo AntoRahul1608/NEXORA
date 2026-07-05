@@ -1,4 +1,5 @@
 import React from 'react';
+import { useFormContext } from 'react-hook-form';
 import { sendEvent } from '../../api/api';
 import { useNexoraStore } from '../../store/store';
 import { Loader2 } from 'lucide-react';
@@ -23,7 +24,16 @@ export const Button: React.FC<ButtonProps> = ({
   const setAgentState = useNexoraStore((state) => state.setAgentState);
   const setActions = useNexoraStore((state) => state.setActions);
 
-  const handleClick = async () => {
+  const methods = useFormContext();
+  const isInsideForm = !!methods;
+
+  const handleClick = async (e: React.MouseEvent) => {
+    // If inside a form and it's a primary button without a specific non-submit action, let the form handle it natively.
+    if (isInsideForm && variant === 'primary' && (!action_id || action_id === 'submit')) {
+      return; // form's onSubmit will handle this
+    }
+
+    e.preventDefault();
     if (!action_id || !sessionId) return;
     setLoading(true);
     try {
@@ -62,10 +72,12 @@ export const Button: React.FC<ButtonProps> = ({
     ghost: 'bg-transparent text-dark-200 hover:text-white hover:bg-white/5 active:scale-[0.98]',
   };
 
+  const isSubmit = isInsideForm && variant === 'primary' && (!action_id || action_id === 'submit');
+
   return (
     <button
-      type="button"
-      onClick={handleClick}
+      type={isSubmit ? 'submit' : 'button'}
+      onClick={isSubmit ? undefined : handleClick}
       disabled={disabled || isLoading}
       className={`flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer ${variantClasses[variant]}`}
     >
