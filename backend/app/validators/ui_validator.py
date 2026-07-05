@@ -91,10 +91,46 @@ class UIValidator:
         if component.component == "chart" and component.props:
             errors.extend(self.validate_chart_config(component.props, component.id))
 
-        # 3. Recursively validate children
+        # 3. Progress-specific validation
+        if component.component == "progress" and component.props:
+            errors.extend(self.validate_progress_props(component.props, component.id))
+
+        # 4. Recursively validate children
         if component.children:
             for child in component.children:
                 errors.extend(self.validate_component(child))
+
+        return errors
+
+    def validate_progress_props(
+        self,
+        props: dict[str, Any],
+        component_id: str = "unknown",
+    ) -> list[str]:
+        """Validate progress-specific props."""
+        errors: list[str] = []
+
+        value = props.get("value")
+        if value is None:
+            errors.append(
+                f"Progress component '{component_id}' is missing required prop 'value'."
+            )
+        elif not isinstance(value, (int, float, str)):
+            errors.append(
+                f"Progress component '{component_id}' prop 'value' must be a number or numeric string, got {type(value).__name__}."
+            )
+        else:
+            try:
+                numeric_value = float(str(value).strip().replace('%', ''))
+            except ValueError:
+                errors.append(
+                    f"Progress component '{component_id}' prop 'value' must be numeric, got '{value}'."
+                )
+            else:
+                if not (0 <= numeric_value <= 100):
+                    errors.append(
+                        f"Progress component '{component_id}' prop 'value' must be between 0 and 100. Got {numeric_value}."
+                    )
 
         return errors
 

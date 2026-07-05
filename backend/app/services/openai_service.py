@@ -36,12 +36,14 @@ class OpenAIService:
         """Initialise the OpenAI async client."""
         self.client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
         self.model: str = settings.OPENAI_MODEL
+        self.timeout: int = settings.OPENAI_TIMEOUT
+        self.max_retries: int = settings.OPENAI_MAX_RETRIES
 
     async def generate_response(
         self,
         messages: list[dict[str, Any]],
         system_prompt: str,
-        max_retries: int = 3,
+        max_retries: int | None = None,
     ) -> AgentResponse:
         """Generate a structured AI response with dynamic UI.
 
@@ -65,25 +67,28 @@ class OpenAIService:
                 "in the backend directory and configure your key."
             )
 
+        effective_retries = self.max_retries if max_retries is None else max_retries
         last_error: Exception | None = None
 
-        for attempt in range(1, max_retries + 1):
+        for attempt in range(1, effective_retries + 1):
             try:
                 logger.info(
-                    "OpenAI request attempt %d/%d  model=%s  messages=%d",
+                    "OpenAI request attempt %d/%d  model=%s  messages=%d timeout=%ds",
                     attempt,
-                    max_retries,
+                    effective_retries,
                     self.model,
                     len(messages),
+                    self.timeout,
                 )
 
                 response = await self.client.chat.completions.create(
                     model=self.model,
                     messages=[
                         {"role": "system", "content": system_prompt},
-                        *messages
+                        *messages,
                     ],
                     response_format={"type": "json_object"},
+                    timeout=self.timeout,
                 )
 
                 content = response.choices[0].message.content
@@ -102,16 +107,16 @@ class OpenAIService:
                 logger.warning(
                     "OpenAI request failed (attempt %d/%d): %s",
                     attempt,
-                    max_retries,
+                    effective_retries,
                     str(exc),
                 )
-                if attempt < max_retries:
+                if attempt < effective_retries:
                     wait = 2 ** attempt
                     logger.info("Retrying in %ds …", wait)
                     await asyncio.sleep(wait)
 
         raise ValueError(
-            f"Failed to get AI response after {max_retries} attempts: {last_error}"
+            f"Failed to get AI response after {effective_retries} attempts: {last_error}"
         )
 
 

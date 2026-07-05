@@ -44,7 +44,7 @@ DISPLAY:
   image    — Image. Props: src, alt, caption, width, height
   badge    — Status pill. Props: text, variant("success"|"warning"|"error"|"info"|"default")
   list     — List. Props: items(string[]), ordered(bool)
-  progress — Progress bar. Props: value(0-100), label, color
+  progress — Progress bar. Props: value(0-100 numeric or 0.0-1.0), label, color
 
 INTERACTIVE:
   button — Action button. Props: label, variant("primary"|"secondary"|"danger"|"ghost"), action_id

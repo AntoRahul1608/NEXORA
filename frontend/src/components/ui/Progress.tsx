@@ -1,11 +1,36 @@
 import React from 'react';
 
 interface ProgressProps {
-  value: number;
+  value: number | string;
   label?: string;
   color?: string;
   className?: string;
 }
+
+const parseProgressValue = (value: number | string | undefined): number => {
+  if (value === undefined || value === null) {
+    return 0;
+  }
+
+  let numericValue: number;
+
+  if (typeof value === 'number') {
+    numericValue = value;
+  } else {
+    const normalized = String(value).trim().replace('%', '');
+    numericValue = Number(normalized);
+  }
+
+  if (!Number.isFinite(numericValue)) {
+    return 0;
+  }
+
+  if (numericValue >= 0 && numericValue <= 1) {
+    numericValue *= 100;
+  }
+
+  return Math.min(Math.max(numericValue, 0), 100);
+};
 
 export const Progress: React.FC<ProgressProps> = ({
   value,
@@ -13,7 +38,7 @@ export const Progress: React.FC<ProgressProps> = ({
   color,
   className = '',
 }) => {
-  const percentage = Math.min(Math.max(value, 0), 100);
+  const percentage = parseProgressValue(value);
 
   const barColor = color || 'bg-gradient-to-r from-accent-primary to-accent-secondary';
 

@@ -27,9 +27,9 @@ export const DatePicker: React.FC<DatePickerProps> = ({
       <input
         type="date"
         id={id}
-        className={`w-full px-4 py-3 rounded-xl bg-dark-800/50 border ${
+        className={`w-full px-4 py-3 rounded-xl bg-dark-800/95 border ${
           error ? 'border-accent-error focus:border-accent-error' : 'border-dark-600 focus:border-accent-primary'
-        } text-white focus:outline-none focus:ring-1 focus:ring-opacity-50 transition-all cursor-pointer`}
+        } text-white placeholder-dark-400 focus:outline-none focus:ring-2 focus:ring-accent-primary/20 transition-all cursor-pointer`}
         {...register(id, { required: required ? `${label || id} is required` : false })}
       />
       {helper_text && !error && (

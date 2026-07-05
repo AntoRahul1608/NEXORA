@@ -25,6 +25,8 @@ class Settings(BaseSettings):
 
     OPENAI_API_KEY: str = ""
     OPENAI_MODEL: str = "gpt-4o"
+    OPENAI_TIMEOUT: int = 60
+    OPENAI_MAX_RETRIES: int = 3
     DATABASE_URL: str = "sqlite+aiosqlite:///./nexora.db"
     CORS_ORIGINS: str = "http://localhost:5173"
     LOG_LEVEL: str = "INFO"

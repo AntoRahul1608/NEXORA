@@ -216,7 +216,7 @@ export const ChatScreen: React.FC = () => {
               : 'Select or create a conversation to begin'
           }
           disabled={!sessionId || isLoading}
-          className="flex-1 resize-none max-h-[180px] bg-transparent text-white placeholder-dark-400 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed text-sm leading-relaxed py-2.5 px-1"
+          className="chat-textarea flex-1 resize-none max-h-[180px] rounded-2xl bg-[#10111a] border border-[#262a36] text-white placeholder-dark-400 focus:outline-none focus:border-accent-primary/70 focus:ring-2 focus:ring-accent-primary/20 disabled:opacity-50 disabled:cursor-not-allowed text-sm leading-relaxed py-3 px-4"
         />
 
         {/* Send button */}
